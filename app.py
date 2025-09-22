@@ -280,11 +280,12 @@ def load_custom_css():
     .success-banner {
         background: linear-gradient(45deg, #00ff88, #00ccff);
         color: #000000;
-        padding: 1rem;
-        border-radius: 10px;
+        padding: 0.8rem;
+        border-radius: 8px;
         text-align: center;
-        font-weight: 700;
-        margin: 1rem 0;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin: 0.5rem 0 1.5rem 0;
         animation: slideInDown 0.5s ease-out;
     }
     
@@ -293,15 +294,19 @@ def load_custom_css():
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 2rem;
+        padding: 1.5rem;
         color: #00ff88;
+        background: #0a0a0a;
+        border-radius: 10px;
+        border: 1px solid #333;
+        margin: 1rem 0;
     }
     
     .loading-spinner {
-        width: 60px;
-        height: 60px;
-        border: 4px solid #333;
-        border-top: 4px solid #00ff88;
+        width: 40px;
+        height: 40px;
+        border: 3px solid #333;
+        border-top: 3px solid #00ff88;
         border-radius: 50%;
         animation: spin 1s linear infinite;
     }
@@ -309,7 +314,8 @@ def load_custom_css():
     .loading-text {
         margin-top: 1rem;
         color: #00ff88;
-        font-weight: 600;
+        font-weight: 500;
+        font-size: 0.9rem;
     }
     
     /* Hide Streamlit elements */
@@ -502,20 +508,32 @@ with col_right:
     st.markdown('</div>', unsafe_allow_html=True)
     
     if uploaded_file and detect_button:
-        # Loading animation
-        with st.spinner(""):
+        # Show loading animation during processing
+        loading_placeholder = st.empty()
+        with loading_placeholder:
             st.markdown('''
                 <div class="loading-container">
                     <div class="loading-spinner"></div>
                     <div class="loading-text">🔄 ANALYZING GEAR IMAGE...</div>
                 </div>
             ''', unsafe_allow_html=True)
-            
-            time.sleep(2)
+        
+        # Processing with spinner
+        with st.spinner(""):
+            time.sleep(1.5)  # Reduced time for faster response
             result_img, detected_labels = predict_and_overlay(img)
+        
+        # Clear the loading animation
+        loading_placeholder.empty()
 
-        # Success message
-        st.markdown('<div class="success-banner">✅ DETECTION COMPLETED SUCCESSFULLY!</div>', unsafe_allow_html=True)
+        # Brief success message that fades quickly
+        success_placeholder = st.empty()
+        with success_placeholder:
+            st.markdown('<div class="success-banner">✅ DETECTION COMPLETED</div>', unsafe_allow_html=True)
+        
+        # Clear success message after a brief moment for cleaner UI
+        time.sleep(1)
+        success_placeholder.empty()
         
         # Statistics cards
         st.markdown('<div class="section-title">📊 DETECTION STATISTICS</div>', unsafe_allow_html=True)
