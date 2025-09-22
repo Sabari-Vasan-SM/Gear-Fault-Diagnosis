@@ -116,6 +116,21 @@ def load_custom_css():
         background: #0f0f0f;
     }
     
+    /* Instruction card */
+    .instruction-card {
+        background: linear-gradient(145deg, #0a0a0a, #111111);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border: 1px solid #333;
+        transition: all 0.3s ease;
+    }
+    
+    .instruction-card:hover {
+        border-color: #00ff88;
+        box-shadow: 0 5px 20px rgba(0, 255, 136, 0.1);
+    }
+    
     /* Button styling */
     .stButton > button {
         background: linear-gradient(45deg, #00ff88, #00ccff);
@@ -163,45 +178,49 @@ def load_custom_css():
     .legend-grid {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 0.8rem;
+        gap: 0.6rem;
         background: #0a0a0a;
         border-radius: 10px;
-        padding: 1.5rem;
-        margin: 1rem 0;
+        padding: 1.2rem;
+        margin: 1rem 0 2rem 0;
         border: 1px solid #333;
     }
     
     .legend-item {
         display: flex;
         align-items: center;
-        padding: 0.8rem;
+        padding: 0.6rem;
         background: #111;
-        border-radius: 8px;
-        border-left: 4px solid #00ff88;
+        border-radius: 6px;
+        border-left: 3px solid #00ff88;
         transition: all 0.2s ease;
     }
     
     .legend-item:hover {
         background: #1a1a1a;
-        transform: translateX(5px);
+        transform: translateX(3px);
     }
     
     .legend-color {
-        width: 20px;
-        height: 20px;
+        width: 16px;
+        height: 16px;
         border-radius: 50%;
-        margin-right: 1rem;
+        margin-right: 0.8rem;
         border: 2px solid #333;
+        flex-shrink: 0;
     }
     
     .legend-text {
         color: #ffffff;
-        font-weight: 500;
+        font-weight: 600;
+        font-size: 0.9rem;
+        min-width: 60px;
     }
     
     .legend-desc {
-        color: #888;
-        margin-left: 0.5rem;
+        color: #bbb;
+        margin-left: 0.3rem;
+        font-size: 0.85rem;
     }
     
     /* Stats grid */
@@ -441,33 +460,46 @@ with col_left:
         
         # Detection button
         detect_button = st.button("🔍 START DETECTION", key="detect_btn")
-        
-        # Legend section
-        st.markdown('<div class="section-title">🏷️ FAULT TYPES</div>', unsafe_allow_html=True)
-        st.markdown('<div class="legend-grid">', unsafe_allow_html=True)
-        
-        legend_data = [
-            ("kp", "Key Point (Severe Damage)", "#ffff00"),
-            ("hp_cm", "Corroded/Material Loss", "#ff00ff"), 
-            ("hp_cd", "Chipped/Damaged Tooth", "#ff0080")
-        ]
-        
-        for code, description, color in legend_data:
-            st.markdown(f'''
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: {color};"></div>
-                    <span class="legend-text">{code}:</span>
-                    <span class="legend-desc">{description}</span>
+    
+    # Instructions for users when no image is uploaded
+    else:
+        st.markdown('''
+            <div class="instruction-card">
+                <div style="text-align: center; padding: 2rem; color: #888;">
+                    <h3 style="color: #00ccff; margin-bottom: 1rem;">📸 UPLOAD YOUR GEAR IMAGE</h3>
+                    <p style="margin-bottom: 0.5rem;">• Select a clear image of the gear</p>
+                    <p style="margin-bottom: 0.5rem;">• Supported formats: JPG, JPEG, PNG</p>
+                    <p>• Our AI will detect fault types automatically</p>
                 </div>
-            ''', unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
+            </div>
+        ''', unsafe_allow_html=True)
     
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Right panel - Results
 with col_right:
     st.markdown('<div class="right-panel">', unsafe_allow_html=True)
+    
+    # Always show the fault types legend on the right side
+    st.markdown('<div class="section-title">🏷️ FAULT TYPES</div>', unsafe_allow_html=True)
+    st.markdown('<div class="legend-grid">', unsafe_allow_html=True)
+    
+    legend_data = [
+        ("kp", "Key Point (Severe Damage)", "#ffff00"),
+        ("hp_cm", "Corroded/Material Loss", "#ff00ff"), 
+        ("hp_cd", "Chipped/Damaged Tooth", "#ff0080")
+    ]
+    
+    for code, description, color in legend_data:
+        st.markdown(f'''
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: {color};"></div>
+                <span class="legend-text">{code}:</span>
+                <span class="legend-desc">{description}</span>
+            </div>
+        ''', unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
     
     if uploaded_file and detect_button:
         # Loading animation
@@ -571,17 +603,19 @@ with col_right:
     
     elif uploaded_file and not detect_button:
         st.markdown('''
-            <div style="text-align: center; padding: 3rem; color: #888;">
-                <h3 style="color: #00ccff;">🔍 READY FOR DETECTION</h3>
-                <p>Click "START DETECTION" to analyze your gear image</p>
+            <div style="text-align: center; padding: 2rem; color: #888;">
+                <h3 style="color: #00ccff; margin-bottom: 1rem;">🔍 READY FOR ANALYSIS</h3>
+                <p style="margin-bottom: 0.5rem;">Image uploaded successfully!</p>
+                <p style="font-size: 0.9rem;">Click "START DETECTION" to analyze faults</p>
             </div>
         ''', unsafe_allow_html=True)
     
     else:
         st.markdown('''
-            <div style="text-align: center; padding: 3rem; color: #888;">
-                <h3 style="color: #00ccff;">📤 UPLOAD AN IMAGE</h3>
-                <p>Upload a gear image to begin fault detection analysis</p>
+            <div style="text-align: center; padding: 2rem; color: #888;">
+                <h3 style="color: #00ccff; margin-bottom: 1rem;">� DETECTION READY</h3>
+                <p style="margin-bottom: 0.5rem;">Upload an image to start analysis</p>
+                <p style="font-size: 0.9rem;">Results will appear here after detection</p>
             </div>
         ''', unsafe_allow_html=True)
     
