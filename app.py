@@ -2,18 +2,23 @@ import streamlit as st
 import cv2
 import numpy as np
 import time
-from ultralytics import YOLO 
+from ultralytics import YOLO
 
-# Load YOLO model
+# ---------------- Load YOLO model ----------------
 @st.cache_resource
 def load_model():
-    return YOLO("best.pt")  # make sure best.pt is in same folder
+    return YOLO("best.pt")  # Make sure best.pt is in the same folder
 
 model = load_model()
 
-# Class colors
-class_colors = {"kp": (0, 255, 255), "hp_cm": (255, 0, 255), "hp_cd": (128, 0, 255)}
+# ---------------- Class colors ----------------
+class_colors = {
+    "kp": (0, 255, 255),
+    "hp_cm": (255, 0, 255),
+    "hp_cd": (128, 0, 255)
+}
 
+# ---------------- Prediction function ----------------
 def predict_and_overlay(img):
     result = model.predict(source=img, imgsz=640, conf=0.25, save=False)[0]
     image = result.orig_img.copy()
@@ -32,7 +37,6 @@ def predict_and_overlay(img):
 
     return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-
 # ---------------- Streamlit UI ----------------
 st.set_page_config(page_title="⚙️ Gear Fault Detection", page_icon="🛠", layout="centered")
 st.title("⚙️ Gear Fault Detection Software")
@@ -40,9 +44,9 @@ st.title("⚙️ Gear Fault Detection Software")
 uploaded_file = st.file_uploader("📂 Upload Gear Image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
-    # Convert uploaded file to image
+    # Convert uploaded file to OpenCV image
     file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
-    img = cv2.imdecode(file_bytes, 1)
+    img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
     # Show uploaded image
     st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), caption="📸 Uploaded Image", use_column_width=True)
